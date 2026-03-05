@@ -5,11 +5,12 @@ export async function POST(req: NextRequest) {
   const apiKey = req.headers.get('x-openai-key')
   if (!apiKey) return NextResponse.json({ error: 'Missing OpenAI API key' }, { status: 401 })
 
-  const { topic, grade_level, duration, goals } = await req.json()
+  const { topic, grade_level, language, duration, goals } = await req.json()
   if (!topic || !grade_level || !duration || !goals) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
   }
 
+  const targetLanguage = language ?? 'French'
   const openai = createOpenAIClient(apiKey)
 
   const response = await openai.chat.completions.create({
@@ -22,11 +23,14 @@ export async function POST(req: NextRequest) {
       },
       {
         role: 'user',
-        content: `Create a detailed lesson plan for:
+        content: `Create a detailed lesson plan for a ${targetLanguage} language class.
 - Topic: ${topic}
 - Grade Level: ${grade_level}
+- Lesson Language: ${targetLanguage}
 - Duration: ${duration} minutes
 - Learning Goals: ${goals}
+
+Write all lesson content (objectives, activities, questions, etc.) in ${targetLanguage}.
 
 Return a JSON object with this exact structure:
 {

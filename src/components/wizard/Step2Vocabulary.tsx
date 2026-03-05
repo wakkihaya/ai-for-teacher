@@ -3,21 +3,25 @@
 import { useState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
 import { Card, CardContent } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import type { LessonPlan, VocabWord } from '@/lib/types'
 
 interface Step2Props {
   topic: string
+  language: 'French' | 'Japanese'
   lessonPlan: LessonPlan
   onComplete: (vocabulary: VocabWord[]) => void
   onBack: () => void
 }
 
-export function Step2Vocabulary({ topic, lessonPlan, onComplete, onBack }: Step2Props) {
+export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBack }: Step2Props) {
   const [words, setWords] = useState<VocabWord[]>([])
-  const [loadingVocab, setLoadingVocab] = useState(true)
+  const [loadingVocab, setLoadingVocab] = useState(false)
   const [loadingImages, setLoadingImages] = useState(false)
+  const [keyword, setKeyword] = useState('')
 
   useEffect(() => {
     generateVocab()
@@ -33,7 +37,7 @@ export function Step2Vocabulary({ topic, lessonPlan, onComplete, onBack }: Step2
       const res = await fetch('/api/vocabulary', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-openai-key': apiKey },
-        body: JSON.stringify({ topic, lesson_plan: lessonPlan }),
+        body: JSON.stringify({ topic, language, lesson_plan: lessonPlan, keyword: keyword.trim() || undefined }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
       const vocab: VocabWord[] = await res.json()
@@ -77,12 +81,37 @@ export function Step2Vocabulary({ topic, lessonPlan, onComplete, onBack }: Step2
     setWords((prev) => prev.filter((_, i) => i !== index))
   }
 
-  if (loadingVocab) {
-    return (
-      <div className="space-y-4">
-        <p className="text-muted-foreground text-sm">Extracting vocabulary from your lesson plan…</p>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {Array.from({ length: 6 }).map((_, i) => (
+  return (
+    <div className="space-y-6">
+      <div className="space-y-3">
+        <div className="flex gap-3 items-end">
+          <div className="flex-1 space-y-1">
+            <Label htmlFor="keyword">Vocabulary Keyword <span className="text-muted-foreground font-normal">(optional — e.g. &quot;animals&quot;, &quot;food&quot;)</span></Label>
+            <Input
+              id="keyword"
+              placeholder={`e.g. animals, colors, family…`}
+              value={keyword}
+              onChange={(e) => setKeyword(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && generateVocab()}
+            />
+          </div>
+          <Button variant="outline" onClick={generateVocab} disabled={loadingVocab}>
+            {loadingVocab ? 'Generating…' : words.length > 0 ? 'Regenerate' : 'Generate'}
+          </Button>
+        </div>
+        {words.length > 0 && (
+          <p className="text-sm text-muted-foreground">
+            {words.length} {language} vocabulary words.{' '}
+            {loadingImages && 'Loading images…'}
+            {!loadingImages && !localStorage.getItem('pexels_api_key') &&
+              'Add a Pexels API key in Settings to get images.'}
+          </p>
+        )}
+      </div>
+
+      {loadingVocab && (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 10 }).map((_, i) => (
             <div key={i} className="space-y-2">
               <Skeleton className="h-32 w-full rounded-lg" />
               <Skeleton className="h-4 w-1/2" />
@@ -90,23 +119,7 @@ export function Step2Vocabulary({ topic, lessonPlan, onComplete, onBack }: Step2
             </div>
           ))}
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-muted-foreground">
-          {words.length} vocabulary words found.{' '}
-          {loadingImages && 'Loading images…'}
-          {!loadingImages && !localStorage.getItem('pexels_api_key') &&
-            'Add a Pexels API key in Settings to get images.'}
-        </p>
-        <Button variant="outline" size="sm" onClick={generateVocab}>
-          Regenerate
-        </Button>
-      </div>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {words.map((word, i) => (

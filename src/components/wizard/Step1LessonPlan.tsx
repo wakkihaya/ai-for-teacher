@@ -17,11 +17,15 @@ const GRADE_LEVELS = [
   'Grade 6', 'Grade 7', 'Grade 8', 'Grade 9', 'Grade 10', 'Grade 11', 'Grade 12',
 ]
 
+const LANGUAGES = ['French', 'Japanese'] as const
+type Language = typeof LANGUAGES[number]
+
 interface Step1Props {
   onComplete: (data: {
     title: string
     topic: string
     grade_level: string
+    language: Language
     duration: number
     goals: string
     lesson_plan: LessonPlan
@@ -31,6 +35,7 @@ interface Step1Props {
 export function Step1LessonPlan({ onComplete }: Step1Props) {
   const [topic, setTopic] = useState('')
   const [gradeLevel, setGradeLevel] = useState('')
+  const [language, setLanguage] = useState<Language>('French')
   const [duration, setDuration] = useState(45)
   const [goals, setGoals] = useState('')
   const [loading, setLoading] = useState(false)
@@ -49,7 +54,7 @@ export function Step1LessonPlan({ onComplete }: Step1Props) {
       const res = await fetch('/api/lesson-plan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-openai-key': apiKey },
-        body: JSON.stringify({ topic, grade_level: gradeLevel, duration, goals }),
+        body: JSON.stringify({ topic, grade_level: gradeLevel, language, duration, goals }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
       const plan = await res.json()
@@ -68,6 +73,7 @@ export function Step1LessonPlan({ onComplete }: Step1Props) {
       title: `${topic} — ${gradeLevel}`,
       topic,
       grade_level: gradeLevel,
+      language,
       duration,
       goals,
       lesson_plan: result,
@@ -97,6 +103,19 @@ export function Step1LessonPlan({ onComplete }: Step1Props) {
               <SelectContent>
                 {GRADE_LEVELS.map((g) => (
                   <SelectItem key={g} value={g}>{g}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="space-y-2">
+            <Label>Lesson Language</Label>
+            <Select value={language} onValueChange={(v) => setLanguage(v as Language)}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {LANGUAGES.map((l) => (
+                  <SelectItem key={l} value={l}>{l}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

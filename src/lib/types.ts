@@ -20,6 +20,7 @@ export interface Lesson {
   title: string
   topic: string
   grade_level: string
+  language: 'French' | 'Japanese'
   duration: number
   goals: string
   lesson_plan: LessonPlan | null

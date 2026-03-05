@@ -9,7 +9,8 @@ export async function POST(req: NextRequest) {
       { status: 401 }
     );
 
-  const { topic, grade_level, lesson_plan, vocabulary } = await req.json();
+  const { topic, grade_level, language, lesson_plan, vocabulary } = await req.json();
+  const targetLanguage = language ?? 'French';
   if (!lesson_plan) {
     return NextResponse.json({ error: "Missing lesson_plan" }, { status: 400 });
   }
@@ -31,14 +32,15 @@ export async function POST(req: NextRequest) {
       {
         role: "system",
         content:
-          "You are an expert teacher creating clear, engaging lesson notes for students. Format everything as clean, well-structured markdown.",
+          `You are an expert ${targetLanguage} language teacher creating clear, engaging lesson notes for students. Format everything as clean, well-structured markdown.`,
       },
       {
         role: "user",
-        content: `Create a complete lesson note for students based on this lesson plan.
+        content: `Create a complete lesson note for students based on this ${targetLanguage} language lesson plan.
 
 Topic: ${topic}
 Grade Level: ${grade_level}
+Lesson Language: ${targetLanguage}
 
 Lesson Plan:
 ${JSON.stringify(lesson_plan, null, 2)}
@@ -46,11 +48,11 @@ ${JSON.stringify(lesson_plan, null, 2)}
 Vocabulary Words:
 ${vocabList}
 
-Create a polished lesson note in markdown with these sections:
+Write the lesson note content in ${targetLanguage}. Create a polished lesson note in markdown with these sections:
 1. # [Lesson Title]
 2. ## Learning Objectives
-3. ## Key Vocabulary (with definitions and examples)
-4. ## Lesson Content (expand the main activities into student-readable notes with explanations)
+3. ## Key Vocabulary (word in ${targetLanguage} with English definition and example sentence in ${targetLanguage})
+4. ## Lesson Content (expand the main activities into student-readable notes)
 5. ## Discussion Questions
 6. ## Homework
 

@@ -15,6 +15,7 @@ interface LessonData {
   title: string
   topic: string
   grade_level: string
+  language: 'French' | 'Japanese'
   duration: number
   goals: string
   lesson_plan: LessonPlan
@@ -31,6 +32,7 @@ export function LessonWizard() {
     title: string
     topic: string
     grade_level: string
+    language: 'French' | 'Japanese'
     duration: number
     goals: string
     lesson_plan: LessonPlan
@@ -42,6 +44,7 @@ export function LessonWizard() {
         title: data.title,
         topic: data.topic,
         grade_level: data.grade_level,
+        language: data.language,
         duration: data.duration,
         goals: data.goals,
         lesson_plan: data.lesson_plan,
@@ -55,7 +58,7 @@ export function LessonWizard() {
       return
     }
 
-    setLessonData({ ...data, id: lesson.id, share_slug: lesson.share_slug })
+    setLessonData({ ...data, id: lesson.id, language: data.language, share_slug: lesson.share_slug })
     setStep(2)
   }
 
@@ -100,6 +103,7 @@ export function LessonWizard() {
       {step === 2 && lessonData && (
         <Step2Vocabulary
           topic={lessonData.topic}
+          language={lessonData.language}
           lessonPlan={lessonData.lesson_plan}
           onComplete={handleStep2Complete}
           onBack={() => setStep(1)}
@@ -110,10 +114,12 @@ export function LessonWizard() {
         <Step3LessonNote
           topic={lessonData.topic}
           gradeLevel={lessonData.grade_level}
+          language={lessonData.language}
           lessonPlan={lessonData.lesson_plan}
           vocabulary={vocabulary}
           shareSlug={lessonData.share_slug}
           onShare={handleStep3Share}
+          onSave={handleSaveLessonNote}
           onBack={() => setStep(2)}
         />
       )}

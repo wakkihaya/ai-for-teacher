@@ -10,20 +10,24 @@ import type { LessonPlan, VocabWord } from '@/lib/types'
 interface Step3Props {
   topic: string
   gradeLevel: string
+  language: 'French' | 'Japanese'
   lessonPlan: LessonPlan
   vocabulary: VocabWord[]
   shareSlug: string
   onShare: () => Promise<void>
+  onSave: (markdown: string) => Promise<void>
   onBack: () => void
 }
 
 export function Step3LessonNote({
   topic,
   gradeLevel,
+  language,
   lessonPlan,
   vocabulary,
   shareSlug,
   onShare,
+  onSave,
   onBack,
 }: Step3Props) {
   const [markdown, setMarkdown] = useState<string | null>(null)
@@ -45,11 +49,12 @@ export function Step3LessonNote({
       const res = await fetch('/api/lesson-note', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-openai-key': apiKey },
-        body: JSON.stringify({ topic, grade_level: gradeLevel, lesson_plan: lessonPlan, vocabulary }),
+        body: JSON.stringify({ topic, grade_level: gradeLevel, language, lesson_plan: lessonPlan, vocabulary }),
       })
       if (!res.ok) throw new Error((await res.json()).error)
       const data = await res.json()
       setMarkdown(data.markdown)
+      await onSave(data.markdown)
       toast.success('Lesson note created!')
     } catch (err) {
       toast.error(String(err))

@@ -1,5 +1,14 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Database (Supabase)
+
+If you see **PGRST205** (`Could not find the table 'public.lessons'`), create the table in Supabase:
+
+1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project → **SQL Editor**.
+2. Run the migration: copy and execute the contents of `supabase/migrations/20250305000000_create_lessons.sql`.
+
+After that, reload the schema cache (e.g. wait a few seconds or run another query) and the app should work.
+
 ## Getting Started
 
 First, run the development server:

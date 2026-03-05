@@ -26,7 +26,7 @@ export function Nav() {
     <nav className="border-b bg-background">
       <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
         <Link href="/" className="font-bold text-lg tracking-tight">
-          AI for Teacher
+          Zina AI
         </Link>
         <div className="flex items-center gap-2">
           <Link href="/settings">

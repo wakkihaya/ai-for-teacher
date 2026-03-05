@@ -22,7 +22,7 @@ export default async function SharePage({ params }: { params: Promise<{ slug: st
     <div className="min-h-screen bg-muted/20">
       <header className="border-b bg-background">
         <div className="max-w-3xl mx-auto px-4 h-14 flex items-center justify-between">
-          <span className="font-bold text-lg tracking-tight">AI for Teacher</span>
+          <span className="font-bold text-lg tracking-tight">Zina AI</span>
           <Badge variant="outline">Shared Lesson</Badge>
         </div>
       </header>
@@ -43,7 +43,7 @@ export default async function SharePage({ params }: { params: Promise<{ slug: st
         )}
 
         <p className="text-xs text-muted-foreground text-center pt-4 border-t">
-          Created with AI for Teacher
+          Created with Zina AI
         </p>
       </main>
     </div>

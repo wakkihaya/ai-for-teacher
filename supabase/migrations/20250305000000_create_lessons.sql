@@ -7,6 +7,7 @@ create table if not exists public.lessons (
   title text not null default '',
   topic text not null default '',
   grade_level text not null default '',
+  language text not null default 'French',
   duration integer not null default 0,
   goals text not null default '',
   lesson_plan jsonb,

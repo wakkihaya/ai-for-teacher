@@ -9,7 +9,7 @@ const geistSans = Geist({
 })
 
 export const metadata: Metadata = {
-  title: 'AI for Teacher',
+  title: 'Zina AI',
   description: 'Create lesson plans and share lesson notes with AI',
 }
 

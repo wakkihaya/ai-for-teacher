@@ -1,33 +1,40 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { createOpenAIClient } from '@/lib/openai'
+import { NextRequest, NextResponse } from "next/server";
+import { createOpenAIClient } from "@/lib/openai";
 
 export async function POST(req: NextRequest) {
-  const apiKey = req.headers.get('x-openai-key')
-  if (!apiKey) return NextResponse.json({ error: 'Missing OpenAI API key' }, { status: 401 })
+  const apiKey = req.headers.get("x-openai-key");
+  if (!apiKey)
+    return NextResponse.json(
+      { error: "Missing OpenAI API key" },
+      { status: 401 }
+    );
 
-  const { topic, grade_level, lesson_plan, vocabulary } = await req.json()
+  const { topic, grade_level, lesson_plan, vocabulary } = await req.json();
   if (!lesson_plan) {
-    return NextResponse.json({ error: 'Missing lesson_plan' }, { status: 400 })
+    return NextResponse.json({ error: "Missing lesson_plan" }, { status: 400 });
   }
 
-  const openai = createOpenAIClient(apiKey)
+  const openai = createOpenAIClient(apiKey);
 
   const vocabList = vocabulary
-    ? vocabulary.map((v: { word: string; definition: string; example_sentence: string }) =>
-        `- **${v.word}**: ${v.definition} (e.g., "${v.example_sentence}")`
-      ).join('\n')
-    : ''
+    ? vocabulary
+        .map(
+          (v: { word: string; definition: string; example_sentence: string }) =>
+            `- **${v.word}**: ${v.definition} (e.g., "${v.example_sentence}")`
+        )
+        .join("\n")
+    : "";
 
   const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
+    model: "gpt-4o-mini",
     messages: [
       {
-        role: 'system',
+        role: "system",
         content:
-          'You are an expert teacher creating clear, engaging lesson notes for students. Format everything as clean, well-structured markdown.',
+          "You are an expert teacher creating clear, engaging lesson notes for students. Format everything as clean, well-structured markdown.",
       },
       {
-        role: 'user',
+        role: "user",
         content: `Create a complete lesson note for students based on this lesson plan.
 
 Topic: ${topic}
@@ -50,8 +57,8 @@ Create a polished lesson note in markdown with these sections:
 Make it engaging, clear, and appropriate for the grade level. Use bullet points, bold text, and good formatting.`,
       },
     ],
-  })
+  });
 
-  const markdown = response.choices[0].message.content
-  return NextResponse.json({ markdown })
+  const markdown = response.choices[0].message.content;
+  return NextResponse.json({ markdown });
 }

@@ -6,9 +6,10 @@ interface LessonNoteViewProps {
   lessonNote: string
   vocabulary?: VocabWord[] | null
   showVocabCards?: boolean
+  memo?: string | null
 }
 
-export function LessonNoteView({ lessonNote, vocabulary, showVocabCards = true }: LessonNoteViewProps) {
+export function LessonNoteView({ lessonNote, vocabulary, showVocabCards = true, memo }: LessonNoteViewProps) {
   return (
     <div className="space-y-8">
       {showVocabCards && vocabulary && vocabulary.length > 0 && (
@@ -45,6 +46,13 @@ export function LessonNoteView({ lessonNote, vocabulary, showVocabCards = true }
       <div className="prose prose-sm max-w-none">
         <ReactMarkdown>{lessonNote}</ReactMarkdown>
       </div>
+
+      {memo && (
+        <div className="border rounded-lg p-4 bg-muted/30 space-y-1">
+          <p className="text-sm font-semibold">Teacher Memo</p>
+          <p className="text-sm whitespace-pre-wrap text-muted-foreground">{memo}</p>
+        </div>
+      )}
     </div>
   )
 }

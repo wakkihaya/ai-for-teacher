@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -22,11 +22,7 @@ export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBac
   const [loadingVocab, setLoadingVocab] = useState(false)
   const [loadingImages, setLoadingImages] = useState(false)
   const [keyword, setKeyword] = useState('')
-
-  useEffect(() => {
-    generateVocab()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  const [imageCount, setImageCount] = useState(5)
 
   async function generateVocab() {
     const apiKey = localStorage.getItem('openai_api_key')
@@ -58,8 +54,9 @@ export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBac
 
     setLoadingImages(true)
     const updated = [...vocab]
+    const wordsToFetch = vocab.slice(0, imageCount)
     await Promise.all(
-      vocab.map(async (v, i) => {
+      wordsToFetch.map(async (v, i) => {
         try {
           const res = await fetch('/api/vocabulary-images', {
             method: 'POST',
@@ -84,8 +81,8 @@ export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBac
   return (
     <div className="space-y-6">
       <div className="space-y-3">
-        <div className="flex gap-3 items-end">
-          <div className="flex-1 space-y-1">
+        <div className="flex gap-3 items-end flex-wrap">
+          <div className="flex-1 min-w-48 space-y-1">
             <Label htmlFor="keyword">Vocabulary Keyword <span className="text-muted-foreground font-normal">(optional — e.g. &quot;animals&quot;, &quot;food&quot;)</span></Label>
             <Input
               id="keyword"
@@ -93,6 +90,18 @@ export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBac
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && generateVocab()}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="imageCount">Images to fetch</Label>
+            <Input
+              id="imageCount"
+              type="number"
+              min={0}
+              max={20}
+              value={imageCount}
+              onChange={(e) => setImageCount(Math.max(0, Math.min(20, Number(e.target.value))))}
+              className="w-24"
             />
           </div>
           <Button variant="outline" onClick={generateVocab} disabled={loadingVocab}>
@@ -105,6 +114,11 @@ export function Step2Vocabulary({ topic, language, lessonPlan, onComplete, onBac
             {loadingImages && 'Loading images…'}
             {!loadingImages && !localStorage.getItem('pexels_api_key') &&
               'Add a Pexels API key in Settings to get images.'}
+          </p>
+        )}
+        {words.length === 0 && !loadingVocab && (
+          <p className="text-sm text-muted-foreground">
+            Optionally enter a keyword, then click Generate to create vocabulary words.
           </p>
         )}
       </div>

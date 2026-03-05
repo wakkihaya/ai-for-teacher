@@ -26,6 +26,7 @@ export interface Lesson {
   lesson_plan: LessonPlan | null
   vocabulary: VocabWord[] | null
   lesson_note: string | null
+  memo: string | null
   is_shared: boolean
   share_slug: string
   step_completed: 0 | 1 | 2 | 3

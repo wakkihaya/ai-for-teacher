@@ -37,7 +37,7 @@ export default async function SharePage({ params }: { params: Promise<{ slug: st
         </div>
 
         {l.lesson_note ? (
-          <LessonNoteView lessonNote={l.lesson_note} vocabulary={l.vocabulary} />
+          <LessonNoteView lessonNote={l.lesson_note} vocabulary={l.vocabulary} memo={l.memo} />
         ) : (
           <p className="text-muted-foreground">This lesson note is not yet available.</p>
         )}

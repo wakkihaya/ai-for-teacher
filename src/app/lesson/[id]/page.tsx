@@ -2,8 +2,10 @@ import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Nav } from '@/components/Nav'
-import { LessonNoteView } from '@/components/lesson/LessonNoteView'
+import { LessonNoteEditor } from '@/components/lesson/LessonNoteEditor'
 import { ShareButton } from '@/components/lesson/ShareButton'
+import { MemoEditor } from '@/components/lesson/MemoEditor'
+import { DeleteLessonButton } from '@/components/lesson/DeleteLessonButton'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -22,6 +24,10 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
     <div className="min-h-screen bg-muted/20">
       <Nav />
       <main className="max-w-3xl mx-auto px-4 py-8 space-y-6">
+        <Button variant="ghost" size="sm" asChild className="-ml-2">
+          <Link href="/">← Back</Link>
+        </Button>
+
         <div className="flex items-start justify-between gap-4 flex-wrap">
           <div>
             <h1 className="text-2xl font-bold">{l.title}</h1>
@@ -31,7 +37,7 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
               {l.is_shared && <Badge>Shared</Badge>}
             </div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-wrap">
             {l.step_completed < 3 && (
               <Button variant="outline" asChild>
                 <Link href="/lesson/new">Continue in wizard</Link>
@@ -44,11 +50,15 @@ export default async function LessonDetailPage({ params }: { params: Promise<{ i
                 isShared={l.is_shared}
               />
             )}
+            <DeleteLessonButton lessonId={l.id} />
           </div>
         </div>
 
         {l.lesson_note ? (
-          <LessonNoteView lessonNote={l.lesson_note} vocabulary={l.vocabulary} />
+          <>
+            <LessonNoteEditor lessonId={l.id} initialNote={l.lesson_note} vocabulary={l.vocabulary} />
+            <MemoEditor lessonId={l.id} initialMemo={l.memo} />
+          </>
         ) : l.lesson_plan ? (
           <div className="space-y-4">
             <p className="text-muted-foreground text-sm">
